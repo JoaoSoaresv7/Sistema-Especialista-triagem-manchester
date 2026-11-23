@@ -1,0 +1,201 @@
+{
+  "versao": "1.0",
+  "descricao": "Base de conhecimento do Sistema Especialista de Triagem Clinica (inspirado no Protocolo de Manchester). Prototipo academico.",
+  "classificacoes": {
+    "vermelho": {"rotulo": "Emergência", "tempo_max_min": 0, "salience": 100},
+    "laranja": {"rotulo": "Muito Urgente", "tempo_max_min": 10, "salience": 80},
+    "amarelo": {"rotulo": "Urgente", "tempo_max_min": 60, "salience": 60},
+    "verde": {"rotulo": "Pouco Urgente", "tempo_max_min": 120, "salience": 40},
+    "azul": {"rotulo": "Não Urgente", "tempo_max_min": 240, "salience": 20}
+  },
+  "perguntas_gerais": [
+    {"fato": "vias_aereas_comprometidas", "tipo": "bool", "texto": "Há comprometimento das vias aéreas (não consegue falar/respirar, ruído obstrutivo)?"},
+    {"fato": "sinais_de_choque", "tipo": "bool", "texto": "Há sinais de choque (palidez extrema, pele fria e pegajosa, pulso fraco e rápido)?"},
+    {"fato": "convulsao_ativa", "tipo": "bool", "texto": "O paciente está convulsionando agora?"},
+    {"fato": "alteracao_subita_consciencia", "tipo": "bool", "texto": "Houve alteração súbita do nível de consciência?"},
+    {"fato": "hemorragia_maior", "tipo": "bool", "texto": "Há hemorragia maior / incontrolável?"},
+    {"fato": "sinais_vitais_estaveis", "tipo": "bool", "texto": "Os sinais vitais estão estáveis (FC, PA e FR dentro do esperado)?"},
+    {"fato": "queixa_cronica_sem_agudizacao", "tipo": "bool", "texto": "A queixa é crônica, sem piora recente?"}
+  ],
+  "fluxogramas": {
+    "dor_toracica": {
+      "nome": "Dor Torácica",
+      "perguntas": [
+        {"fato": "dor_precordial_tipica", "tipo": "bool", "texto": "A dor é precordial típica (aperto/peso no peito, irradia para braço/mandíbula)?"},
+        {"fato": "saturacao_o2", "tipo": "int", "min": 0, "max": 100, "texto": "Saturação de O2 (%)?"},
+        {"fato": "dor_escala", "tipo": "int", "min": 0, "max": 10, "texto": "Intensidade da dor (0 a 10)?"},
+        {"fato": "dor_pleuritica", "tipo": "bool", "texto": "A dor piora ao respirar fundo (pleurítica)?"}
+      ]
+    },
+    "febre": {
+      "nome": "Febre",
+      "perguntas": [
+        {"fato": "febre_temp", "tipo": "float", "min": 34, "max": 43, "texto": "Temperatura em °C?"},
+        {"fato": "febre_dias", "tipo": "int", "min": 0, "max": 60, "texto": "Há quantos dias há febre?"},
+        {"fato": "rigidez_nucal", "tipo": "bool", "texto": "Há rigidez de nuca?"},
+        {"fato": "petequias", "tipo": "bool", "texto": "Há petéquias / manchas roxas que não somem à pressão?"},
+        {"fato": "saturacao_o2", "tipo": "int", "min": 0, "max": 100, "texto": "Saturação de O2 (%)?"},
+        {"fato": "vomitos_continuos", "tipo": "bool", "texto": "Há vômitos contínuos?"},
+        {"fato": "sintomas_gripais", "tipo": "bool", "texto": "Há sintomas gripais (coriza, tosse, dor no corpo)?"}
+      ]
+    },
+    "dor_abdominal": {
+      "nome": "Dor Abdominal",
+      "perguntas": [
+        {"fato": "dor_escala", "tipo": "int", "min": 0, "max": 10, "texto": "Intensidade da dor (0 a 10)?"},
+        {"fato": "abdome_rigido", "tipo": "bool", "texto": "O abdome está rígido / muito doloroso à palpação?"},
+        {"fato": "vomito_com_sangue", "tipo": "bool", "texto": "Há vômito com sangue?"},
+        {"fato": "vomitos_continuos", "tipo": "bool", "texto": "Há vômitos contínuos?"}
+      ]
+    },
+    "cefaleia": {
+      "nome": "Cefaleia (Dor de Cabeça)",
+      "perguntas": [
+        {"fato": "dor_escala", "tipo": "int", "min": 0, "max": 10, "texto": "Intensidade da dor (0 a 10)?"},
+        {"fato": "cefaleia_subita_intensa", "tipo": "bool", "texto": "Início súbito, 'a pior dor da vida'?"},
+        {"fato": "deficit_neurologico", "tipo": "bool", "texto": "Há déficit neurológico (fraqueza de um lado, fala alterada, visão turva)?"},
+        {"fato": "vomitos_continuos", "tipo": "bool", "texto": "Há vômitos contínuos?"}
+      ]
+    },
+    "ferida_curativo": {
+      "nome": "Ferida / Curativo",
+      "perguntas": [
+        {"fato": "sinais_infeccao_local", "tipo": "bool", "texto": "Há sinais de infecção local (pus, vermelhidão extensa, calor)?"},
+        {"fato": "febre_associada", "tipo": "bool", "texto": "Há febre associada?"},
+        {"fato": "ferida_profunda_sutura", "tipo": "bool", "texto": "A ferida é profunda / precisa de sutura?"},
+        {"fato": "troca_curativo_simples", "tipo": "bool", "texto": "É apenas troca de curativo simples?"}
+      ]
+    }
+  },
+  "regras": [
+    {"id": "DER1", "nome": "Dor intensa", "queixa": "*", "salience": 1000, "terminal": false,
+     "se": ["dor_escala", ">=", 8], "entao": {"dor_nivel": "intensa"},
+     "justificativa": "Escala de dor >= 8 deriva dor_nivel = intensa."},
+    {"id": "DER2", "nome": "Dor moderada", "queixa": "*", "salience": 1000, "terminal": false,
+     "se": {"all": [["dor_escala", ">=", 5], ["dor_escala", "<", 8]]}, "entao": {"dor_nivel": "moderada"},
+     "justificativa": "Escala de dor entre 5 e 7 deriva dor_nivel = moderada."},
+    {"id": "DER3", "nome": "Dor leve", "queixa": "*", "salience": 1000, "terminal": false,
+     "se": {"all": [["dor_escala", ">=", 1], ["dor_escala", "<", 5]]}, "entao": {"dor_nivel": "leve"},
+     "justificativa": "Escala de dor entre 1 e 4 deriva dor_nivel = leve."},
+    {"id": "DER4", "nome": "Sem dor", "queixa": "*", "salience": 1000, "terminal": false,
+     "se": ["dor_escala", "==", 0], "entao": {"dor_nivel": "ausente"},
+     "justificativa": "Escala de dor 0 deriva dor_nivel = ausente."},
+    {"id": "DER5", "nome": "Febre alta", "queixa": "*", "salience": 1000, "terminal": false,
+     "se": ["febre_temp", ">=", 39], "entao": {"febre_nivel": "alta"},
+     "justificativa": "Temperatura >= 39 °C deriva febre_nivel = alta."},
+    {"id": "DER6", "nome": "Febre baixa", "queixa": "*", "salience": 1000, "terminal": false,
+     "se": {"all": [["febre_temp", ">=", 37.8], ["febre_temp", "<", 39]]}, "entao": {"febre_nivel": "baixa"},
+     "justificativa": "Temperatura entre 37,8 e 38,9 °C deriva febre_nivel = baixa."},
+    {"id": "DER7", "nome": "Sem febre", "queixa": "*", "salience": 1000, "terminal": false,
+     "se": ["febre_temp", "<", 37.8], "entao": {"febre_nivel": "ausente"},
+     "justificativa": "Temperatura < 37,8 °C deriva febre_nivel = ausente."},
+
+    {"id": "G1", "nome": "Emergência: vias aéreas, choque ou convulsão ativa", "queixa": "*", "salience": 100, "terminal": true,
+     "se": {"all": [["prioridade", "==", null],
+                    {"any": [["vias_aereas_comprometidas", "==", true], ["sinais_de_choque", "==", true], ["convulsao_ativa", "==", true]]}]},
+     "entao": {"prioridade": "vermelho"},
+     "justificativa": "Comprometimento de vias aéreas, choque ou convulsão ativa exige atendimento imediato."},
+    {"id": "G2", "nome": "Muito urgente: alteração súbita de consciência ou hemorragia maior", "queixa": "*", "salience": 80, "terminal": true,
+     "se": {"all": [["prioridade", "==", null],
+                    {"any": [["alteracao_subita_consciencia", "==", true], ["hemorragia_maior", "==", true]]}]},
+     "entao": {"prioridade": "laranja"},
+     "justificativa": "Alteração súbita de consciência ou hemorragia maior é discriminador de alto risco."},
+
+    {"id": "DT2", "nome": "Dor torácica muito urgente", "queixa": "dor_toracica", "salience": 80, "terminal": true,
+     "se": {"all": [["prioridade", "==", null],
+                    {"any": [["dor_precordial_tipica", "==", true], ["saturacao_o2", "<", 90], ["dor_nivel", "==", "intensa"]]}]},
+     "entao": {"prioridade": "laranja"},
+     "justificativa": "Dor precordial típica, SpO2 < 90% ou dor intensa (>= 8)."},
+    {"id": "DT3", "nome": "Dor torácica urgente", "queixa": "dor_toracica", "salience": 60, "terminal": true,
+     "se": {"all": [["prioridade", "==", null],
+                    {"any": [["dor_pleuritica", "==", true], ["dor_nivel", "==", "moderada"]]}]},
+     "entao": {"prioridade": "amarelo"},
+     "justificativa": "Dor pleurítica ou dor moderada (5 a 7)."},
+    {"id": "DT4", "nome": "Dor torácica pouco urgente", "queixa": "dor_toracica", "salience": 40, "terminal": true,
+     "se": {"all": [["prioridade", "==", null], ["dor_nivel", "==", "leve"], ["sinais_vitais_estaveis", "==", true],
+                    ["queixa_cronica_sem_agudizacao", "!=", true]]},
+     "entao": {"prioridade": "verde"},
+     "justificativa": "Dor leve recente (< 5) com sinais vitais estáveis."},
+
+    {"id": "FE2", "nome": "Febre muito urgente", "queixa": "febre", "salience": 80, "terminal": true,
+     "se": {"all": [["prioridade", "==", null],
+                    {"any": [["rigidez_nucal", "==", true], ["petequias", "==", true], ["saturacao_o2", "<", 90], ["febre_temp", ">=", 41]]}]},
+     "entao": {"prioridade": "laranja"},
+     "justificativa": "Rigidez de nuca, petéquias, SpO2 < 90% ou temperatura >= 41 °C."},
+    {"id": "FE3", "nome": "Febre urgente", "queixa": "febre", "salience": 60, "terminal": true,
+     "se": {"all": [["prioridade", "==", null],
+                    {"any": [["febre_nivel", "==", "alta"], ["febre_dias", ">=", 3], ["vomitos_continuos", "==", true]]}]},
+     "entao": {"prioridade": "amarelo"},
+     "justificativa": "Febre alta (>= 39 °C), febre persistente (>= 3 dias) ou vômitos contínuos."},
+    {"id": "FE4", "nome": "Febre pouco urgente", "queixa": "febre", "salience": 40, "terminal": true,
+     "se": {"all": [["prioridade", "==", null], ["sinais_vitais_estaveis", "==", true],
+                    {"any": [["febre_nivel", "==", "baixa"], ["sintomas_gripais", "==", true]]}]},
+     "entao": {"prioridade": "verde"},
+     "justificativa": "Febre baixa ou sintomas gripais sem sinais de alerta."},
+
+    {"id": "AB2", "nome": "Dor abdominal muito urgente", "queixa": "dor_abdominal", "salience": 80, "terminal": true,
+     "se": {"all": [["prioridade", "==", null],
+                    {"any": [["abdome_rigido", "==", true], ["vomito_com_sangue", "==", true], ["dor_nivel", "==", "intensa"]]}]},
+     "entao": {"prioridade": "laranja"},
+     "justificativa": "Abdome rígido, vômito com sangue ou dor intensa."},
+    {"id": "AB3", "nome": "Dor abdominal urgente", "queixa": "dor_abdominal", "salience": 60, "terminal": true,
+     "se": {"all": [["prioridade", "==", null],
+                    {"any": [["dor_nivel", "==", "moderada"], ["vomitos_continuos", "==", true]]}]},
+     "entao": {"prioridade": "amarelo"},
+     "justificativa": "Dor moderada ou vômitos contínuos."},
+    {"id": "AB4", "nome": "Dor abdominal pouco urgente", "queixa": "dor_abdominal", "salience": 40, "terminal": true,
+     "se": {"all": [["prioridade", "==", null], ["dor_nivel", "==", "leve"], ["sinais_vitais_estaveis", "==", true],
+                    ["queixa_cronica_sem_agudizacao", "!=", true]]},
+     "entao": {"prioridade": "verde"},
+     "justificativa": "Dor leve recente com sinais vitais estáveis."},
+
+    {"id": "CE2", "nome": "Cefaleia muito urgente", "queixa": "cefaleia", "salience": 80, "terminal": true,
+     "se": {"all": [["prioridade", "==", null],
+                    {"any": [["cefaleia_subita_intensa", "==", true], ["deficit_neurologico", "==", true], ["dor_nivel", "==", "intensa"]]}]},
+     "entao": {"prioridade": "laranja"},
+     "justificativa": "Início súbito intenso, déficit neurológico ou dor intensa."},
+    {"id": "CE3", "nome": "Cefaleia urgente", "queixa": "cefaleia", "salience": 60, "terminal": true,
+     "se": {"all": [["prioridade", "==", null],
+                    {"any": [["dor_nivel", "==", "moderada"], ["vomitos_continuos", "==", true]]}]},
+     "entao": {"prioridade": "amarelo"},
+     "justificativa": "Dor moderada ou vômitos contínuos."},
+    {"id": "CE4", "nome": "Cefaleia pouco urgente", "queixa": "cefaleia", "salience": 40, "terminal": true,
+     "se": {"all": [["prioridade", "==", null], ["dor_nivel", "==", "leve"], ["sinais_vitais_estaveis", "==", true],
+                    ["queixa_cronica_sem_agudizacao", "!=", true]]},
+     "entao": {"prioridade": "verde"},
+     "justificativa": "Dor leve recente com sinais vitais estáveis."},
+
+    {"id": "FC3", "nome": "Ferida urgente", "queixa": "ferida_curativo", "salience": 60, "terminal": true,
+     "se": {"all": [["prioridade", "==", null],
+                    {"any": [{"all": [["sinais_infeccao_local", "==", true], ["febre_associada", "==", true]]},
+                             ["ferida_profunda_sutura", "==", true]]}]},
+     "entao": {"prioridade": "amarelo"},
+     "justificativa": "Infecção local com febre ou ferida profunda que precisa de sutura."},
+    {"id": "FC4", "nome": "Ferida pouco urgente", "queixa": "ferida_curativo", "salience": 40, "terminal": true,
+     "se": {"all": [["prioridade", "==", null], ["sinais_infeccao_local", "==", true]]},
+     "entao": {"prioridade": "verde"},
+     "justificativa": "Sinais locais de infecção sem febre."},
+    {"id": "FC5", "nome": "Troca de curativo simples", "queixa": "ferida_curativo", "salience": 20, "terminal": true,
+     "se": {"all": [["prioridade", "==", null], ["troca_curativo_simples", "==", true], ["sinais_vitais_estaveis", "==", true]]},
+     "entao": {"prioridade": "azul"},
+     "justificativa": "Troca de curativo simples, sem sinais de alerta."},
+
+    {"id": "HY1", "nome": "Modelo supervisionado: risco alto (só escalona)", "queixa": "*", "salience": 80, "terminal": true,
+     "se": {"all": [["prioridade", "==", null], ["risco_ml", "==", "alto"]]},
+     "entao": {"prioridade": "laranja"},
+     "justificativa": "O modelo de aprendizado supervisionado estimou risco alto com confiança acima do limiar; o resultado é escalonado para Laranja (o modelo nunca rebaixa a classificação)."},
+    {"id": "HY2", "nome": "Modelo supervisionado: risco médio (só escalona)", "queixa": "*", "salience": 60, "terminal": true,
+     "se": {"all": [["prioridade", "==", null], ["risco_ml", "==", "medio"]]},
+     "entao": {"prioridade": "amarelo"},
+     "justificativa": "O modelo de aprendizado supervisionado estimou risco médio com confiança acima do limiar; o resultado é escalonado para Amarelo (o modelo nunca rebaixa a classificação)."},
+
+    {"id": "A1", "nome": "Queixa crônica sem agudização", "queixa": "*", "salience": 20, "terminal": true,
+     "se": {"all": [["prioridade", "==", null], ["queixa_cronica_sem_agudizacao", "==", true], ["sinais_vitais_estaveis", "==", true]]},
+     "entao": {"prioridade": "azul"},
+     "justificativa": "Queixa crônica sem agudização e sinais vitais estáveis."},
+
+    {"id": "F1", "nome": "Regra de segurança (padrão conservador)", "queixa": "*", "salience": 5, "terminal": true,
+     "se": ["prioridade", "==", null], "entao": {"prioridade": "amarelo"},
+     "justificativa": "Nenhuma regra específica foi satisfeita; por segurança, escala-se para Amarelo e recomenda-se avaliação do profissional."}
+  ]
+}

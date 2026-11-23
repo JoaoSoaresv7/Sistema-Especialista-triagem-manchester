@@ -1,0 +1,29 @@
+id,queixa,salience,terminal,prioridade,nome,justificativa
+DER1,*,1000,False,,Dor intensa,Escala de dor >= 8 deriva dor_nivel = intensa.
+DER2,*,1000,False,,Dor moderada,Escala de dor entre 5 e 7 deriva dor_nivel = moderada.
+DER3,*,1000,False,,Dor leve,Escala de dor entre 1 e 4 deriva dor_nivel = leve.
+DER4,*,1000,False,,Sem dor,Escala de dor 0 deriva dor_nivel = ausente.
+DER5,*,1000,False,,Febre alta,Temperatura >= 39 °C deriva febre_nivel = alta.
+DER6,*,1000,False,,Febre baixa,"Temperatura entre 37,8 e 38,9 °C deriva febre_nivel = baixa."
+DER7,*,1000,False,,Sem febre,"Temperatura < 37,8 °C deriva febre_nivel = ausente."
+G1,*,100,True,vermelho,"Emergência: vias aéreas, choque ou convulsão ativa","Comprometimento de vias aéreas, choque ou convulsão ativa exige atendimento imediato."
+G2,*,80,True,laranja,Muito urgente: alteração súbita de consciência ou hemorragia maior,Alteração súbita de consciência ou hemorragia maior é discriminador de alto risco.
+DT2,dor_toracica,80,True,laranja,Dor torácica muito urgente,"Dor precordial típica, SpO2 < 90% ou dor intensa (>= 8)."
+DT3,dor_toracica,60,True,amarelo,Dor torácica urgente,Dor pleurítica ou dor moderada (5 a 7).
+DT4,dor_toracica,40,True,verde,Dor torácica pouco urgente,Dor leve recente (< 5) com sinais vitais estáveis.
+FE2,febre,80,True,laranja,Febre muito urgente,"Rigidez de nuca, petéquias, SpO2 < 90% ou temperatura >= 41 °C."
+FE3,febre,60,True,amarelo,Febre urgente,"Febre alta (>= 39 °C), febre persistente (>= 3 dias) ou vômitos contínuos."
+FE4,febre,40,True,verde,Febre pouco urgente,Febre baixa ou sintomas gripais sem sinais de alerta.
+AB2,dor_abdominal,80,True,laranja,Dor abdominal muito urgente,"Abdome rígido, vômito com sangue ou dor intensa."
+AB3,dor_abdominal,60,True,amarelo,Dor abdominal urgente,Dor moderada ou vômitos contínuos.
+AB4,dor_abdominal,40,True,verde,Dor abdominal pouco urgente,Dor leve recente com sinais vitais estáveis.
+CE2,cefaleia,80,True,laranja,Cefaleia muito urgente,"Início súbito intenso, déficit neurológico ou dor intensa."
+CE3,cefaleia,60,True,amarelo,Cefaleia urgente,Dor moderada ou vômitos contínuos.
+CE4,cefaleia,40,True,verde,Cefaleia pouco urgente,Dor leve recente com sinais vitais estáveis.
+FC3,ferida_curativo,60,True,amarelo,Ferida urgente,Infecção local com febre ou ferida profunda que precisa de sutura.
+FC4,ferida_curativo,40,True,verde,Ferida pouco urgente,Sinais locais de infecção sem febre.
+FC5,ferida_curativo,20,True,azul,Troca de curativo simples,"Troca de curativo simples, sem sinais de alerta."
+HY1,*,80,True,laranja,Modelo supervisionado: risco alto (só escalona),O modelo de aprendizado supervisionado estimou risco alto com confiança acima do limiar; o resultado é escalonado para Laranja (o modelo nunca rebaixa a classificação).
+HY2,*,60,True,amarelo,Modelo supervisionado: risco médio (só escalona),O modelo de aprendizado supervisionado estimou risco médio com confiança acima do limiar; o resultado é escalonado para Amarelo (o modelo nunca rebaixa a classificação).
+A1,*,20,True,azul,Queixa crônica sem agudização,Queixa crônica sem agudização e sinais vitais estáveis.
+F1,*,5,True,amarelo,Regra de segurança (padrão conservador),"Nenhuma regra específica foi satisfeita; por segurança, escala-se para Amarelo e recomenda-se avaliação do profissional."

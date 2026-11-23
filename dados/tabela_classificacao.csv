@@ -1,0 +1,6 @@
+cor,rotulo,tempo_max_min,salience
+vermelho,Emergência,0,100
+laranja,Muito Urgente,10,80
+amarelo,Urgente,60,60
+verde,Pouco Urgente,120,40
+azul,Não Urgente,240,20
