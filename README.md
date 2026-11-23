@@ -19,12 +19,6 @@ Rode a partir desta pasta (lê `base_conhecimento.json` e `dados/` por caminho r
 
 O modelo estima o risco (`baixo`, `medio`, `alto`) a partir dos fatos informados. Se a confiança for ≥ 0,60, a previsão entra no motor como o fato `risco_ml`. As regras HY1/HY2 só **escalonam** a prioridade (Laranja/Amarelo): o modelo **nunca rebaixa** a classificação e **nunca decide Vermelho** (reservado aos discriminadores críticos). Em dúvida, a regra F1 escala para Amarelo. Motor: forward chaining, saliência e short-circuit.
 
-## O que falta para o relatório
-
-1. Colocar **casos reais rotulados por profissional** em `dados/casos_rotulados_ouro.csv` (mesmas colunas de `casos_sinteticos.csv`), com **pelo menos 30**. Sem isso o sistema roda em **modo demonstração** e avisa que as métricas não valem.
-2. Validar os limiares clínicos das regras com um especialista.
-3. Revisar com suas palavras as análises da seção 9 do notebook.
-
 ## Arquivos
 
 - `triagem_hibrida.ipynb`: notebook completo, já executado (avaliação, validação cruzada, limiar de confiança, integração e verificação de segurança).
