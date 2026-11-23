@@ -32,7 +32,6 @@ O modelo estima o risco (`baixo`, `medio`, `alto`) a partir dos fatos informados
 - `dados/casos_sinteticos.csv`: 600 casos **FICTÍCIOS** para treinar e testar o código. `regras.csv` e `tabela_classificacao.csv` são conferências exportadas do JSON.
 - `scripts/`: gera os casos sintéticos (`gerar_casos_sinteticos.py`) e exporta as regras (`exportar_regras.py`).
 - `tests/`: regras e motor (`test_triagem.py`), modelo e integração (`test_hibrido.py`).
-- `docs/`: texto usado na tabela de entrega.
 
 ## Conferência
 
@@ -42,12 +41,3 @@ O modelo estima o risco (`baixo`, `medio`, `alto`) a partir dos fatos informados
 
 O modelo foi treinado com dados sintéticos e sua previsão é um sinal fraco, tratado como sugestão. Sistemas especialistas lidam mal com ambiguidade e exigem atualização manual das regras. Casos atípicos podem escapar das regras; nesses casos vale a regra de segurança (Amarelo) e a avaliação humana. Fatos não informados são tratados como ausentes.
 
-**Segurança e LGPD:** sem estado (os fatos são descartados ao final), sem dados pessoais; auditoria anônima opcional (`--auditar`) registra só data/hora e cor.
-
-## Declaração de uso de IA
-
-*Rascunho: ajuste ao que você de fato verificou antes de entregar.*
-
-**IA incorporada ao projeto.** Regressão Logística (scikit-learn) estima o nível de risco a partir dos fatos clínicos informados e, junto com o motor de regras, gera a classificação com tempo-alvo e explicação. A equipe verificou o funcionamento com 43 testes, validação cruzada e a checagem de que o modelo nunca rebaixa nem cria Vermelho sozinho. Limitações: treino com dados sintéticos e baixa confiança em casos atípicos. A revisão cabe ao profissional de saúde que opera o sistema.
-
-**IA utilizada na elaboração do trabalho.** Utilizei o Claude (Anthropic) para apoiar a estruturação do código, das regras, dos testes, do notebook e da documentação. Aproveitei as contribuições após executar os testes e o notebook e conferir as regras contra a especificação. Assumo a responsabilidade pelas escolhas, verificações e conteúdo da entrega.
